@@ -13,7 +13,7 @@ class MessageCreateAction extends Action {
       id: data.id,
       timestamp: data.timestamp,
       mentions: data.mentions,
-      author: data.author,
+      author: client.users.add(data.author),
       content: data.content,
       guild: {
         id: data.guild_id
@@ -27,7 +27,7 @@ class MessageCreateAction extends Action {
      * @param {Message} message The created message
      */
 
-    client.emit("MESSAGE", messageData);
+    client.emit(Events.MESSAGE_CREATE, messageData);
 
   }
 }

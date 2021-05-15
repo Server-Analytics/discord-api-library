@@ -418,9 +418,8 @@ class Guild extends Base {
     if (data.members) {
       this.members.cache.clear();
       for (const guildUser of data.members) {
-        console.log(this.roles.cache.map(r => r.id).some(r => guildUser.roles.includes(r)));
+        if (this.roles.cache.map(r => r.id).some(r => guildUser.roles.includes(r))) this.members.add(guildUser);
       }
-      //this.members.add(guildUser);
     }
 
     if (data.owner_id) {

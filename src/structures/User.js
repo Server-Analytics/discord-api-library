@@ -2,7 +2,9 @@
 
 const Base = require('./Base');
 const TextBasedChannel = require('./interfaces/TextBasedChannel');
-const { Error } = require('../errors');
+const {
+  Error
+} = require('../errors');
 const Snowflake = require('../util/Snowflake');
 const UserFlags = require('../util/UserFlags');
 
@@ -94,7 +96,7 @@ class User extends Base {
        * The flags for this user
        * @type {?UserFlags}
        */
-      this.flags = new UserFlags(data.public_flags);
+      //this.flags = new UserFlags(data.public_flags);
     }
 
     /**
@@ -158,7 +160,11 @@ class User extends Base {
     }
     if (!Structures) Structures = require('../util/Structures');
     const Presence = Structures.get('Presence');
-    return new Presence(this.client, { user: { id: this.id } });
+    return new Presence(this.client, {
+      user: {
+        id: this.id
+      }
+    });
   }
 
   /**
@@ -166,7 +172,11 @@ class User extends Base {
    * @param {ImageURLOptions} [options={}] Options for the Image URL
    * @returns {?string}
    */
-  avatarURL({ format, size, dynamic } = {}) {
+  avatarURL({
+    format,
+    size,
+    dynamic
+  } = {}) {
     if (!this.avatar) return null;
     return this.client.rest.cdn.Avatar(this.id, this.avatar, format, size, dynamic);
   }
@@ -245,7 +255,9 @@ class User extends Base {
    */
   async createDM(force = false) {
     if (!force) {
-      const { dmChannel } = this;
+      const {
+        dmChannel
+      } = this;
       if (dmChannel && !dmChannel.partial) return dmChannel;
     }
 
@@ -262,7 +274,9 @@ class User extends Base {
    * @returns {Promise<DMChannel>}
    */
   async deleteDM() {
-    const { dmChannel } = this;
+    const {
+      dmChannel
+    } = this;
     if (!dmChannel) throw new Error('USER_NO_DMCHANNEL');
     const data = await this.client.api.channels(dmChannel.id).delete();
     return this.client.actions.ChannelDelete.handle(data).channel;
@@ -318,8 +332,7 @@ class User extends Base {
   }
 
   toJSON(...props) {
-    const json = super.toJSON(
-      {
+    const json = super.toJSON({
         createdTimestamp: true,
         defaultAvatarURL: true,
         tag: true,

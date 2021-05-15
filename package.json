@@ -1,12 +1,11 @@
 {
   "name": "discord.js",
-  "version": "12.5.3",
-  "description": "A powerful library for interacting with the Discord API",
+  "version": "0.0.1-alpha",
+  "description": "A lightweight and optimized version of Discord.js made for Server Analytics",
   "main": "./src/index",
   "types": "./typings/index.d.ts",
   "exports": {
-    ".": [
-      {
+    ".": [{
         "require": "./src/index.js",
         "import": "./esm/discord.mjs"
       },

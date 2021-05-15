@@ -4,7 +4,11 @@ const BaseClient = require('./BaseClient');
 const ActionsManager = require('./actions/ActionsManager');
 const ClientVoiceManager = require('./voice/ClientVoiceManager');
 const WebSocketManager = require('./websocket/WebSocketManager');
-const { Error, TypeError, RangeError } = require('../errors');
+const {
+  Error,
+  TypeError,
+  RangeError
+} = require('../errors');
 const ChannelManager = require('../managers/ChannelManager');
 const GuildEmojiManager = require('../managers/GuildEmojiManager');
 const GuildManager = require('../managers/GuildManager');
@@ -17,7 +21,11 @@ const Invite = require('../structures/Invite');
 const VoiceRegion = require('../structures/VoiceRegion');
 const Webhook = require('../structures/Webhook');
 const Collection = require('../util/Collection');
-const { Events, browser, DefaultOptions } = require('../util/Constants');
+const {
+  Events,
+  browser,
+  DefaultOptions
+} = require('../util/Constants');
 const DataResolver = require('../util/DataResolver');
 const Intents = require('../util/Intents');
 const Permissions = require('../util/Permissions');
@@ -32,7 +40,9 @@ class Client extends BaseClient {
    * @param {ClientOptions} [options] Options for the client
    */
   constructor(options = {}) {
-    super(Object.assign({ _tokenType: 'Bot' }, options));
+    super(Object.assign({
+      _tokenType: 'Bot'
+    }, options));
 
     // Obtain shard details from environment or if present, worker threads
     let data = process.env;
@@ -60,7 +70,9 @@ class Client extends BaseClient {
     const typeofShards = typeof this.options.shards;
 
     if (typeofShards === 'undefined' && typeof this.options.shardCount === 'number') {
-      this.options.shards = Array.from({ length: this.options.shardCount }, (_, i) => i);
+      this.options.shards = Array.from({
+        length: this.options.shardCount
+      }, (_, i) => i);
     }
 
     if (typeofShards === 'number') this.options.shards = [this.options.shards];
@@ -98,10 +110,9 @@ class Client extends BaseClient {
      * Shard helpers for the client (only if the process was spawned from a {@link ShardingManager})
      * @type {?ShardClientUtil}
      */
-    this.shard =
-      !browser && process.env.SHARDING_MANAGER
-        ? ShardClientUtil.singleton(this, process.env.SHARDING_MANAGER_MODE)
-        : null;
+    this.shard = !browser && process.env.SHARDING_MANAGER ?
+      ShardClientUtil.singleton(this, process.env.SHARDING_MANAGER_MODE) :
+      null;
 
     /**
      * All of the {@link User} objects that have been cached at any point, mapped by their IDs
@@ -133,7 +144,9 @@ class Client extends BaseClient {
      */
     this.presence = new ClientPresence(this);
 
-    Object.defineProperty(this, 'token', { writable: true });
+    Object.defineProperty(this, 'token', {
+      writable: true
+    });
     if (!browser && !this.token && 'DISCORD_TOKEN' in process.env) {
       /**
        * Authorization token for the logged in bot.
@@ -170,9 +183,11 @@ class Client extends BaseClient {
    * @readonly
    */
   get emojis() {
-    const emojis = new GuildEmojiManager({ client: this });
+    const emojis = new GuildEmojiManager({
+      client: this
+    });
     for (const guild of this.guilds.cache.values()) {
-      if (guild.available) for (const emoji of guild.emojis.cache.values()) emojis.cache.set(emoji.id, emoji);
+      //if (guild.available) for (const emoji of guild.emojis.cache.values()) emojis.cache.set(emoji.id, emoji);
     }
     return emojis;
   }
@@ -251,7 +266,11 @@ class Client extends BaseClient {
     const code = DataResolver.resolveInviteCode(invite);
     return this.api
       .invites(code)
-      .get({ query: { with_counts: true } })
+      .get({
+        query: {
+          with_counts: true
+        }
+      })
       .then(data => new Invite(this, data));
   }
 
@@ -389,7 +408,9 @@ class Client extends BaseClient {
         'Client#generateInvite: Generate invite with an options object instead of a PermissionResolvable',
         'DeprecationWarning',
       );
-      options = { permissions: options };
+      options = {
+        permissions: options
+      };
     }
     const application = await this.fetchApplication();
     const query = new URLSearchParams({
