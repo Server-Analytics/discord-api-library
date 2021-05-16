@@ -6,29 +6,39 @@ const {
 } = require('../../util/Constants');
 
 class MessageCreateAction extends Action {
-  async handle(data) {
+  handle(data) {
     const client = this.client;
+    const channel = client.channels.cache.get(data.channel_id);
+    if (channel) {
+      const existing = channel.messages.cache.get(data.id);
+      if (existing) return {
+        message: existing
+      };
+      const message = channel.messages.add(data);
+      const user = message.author;
+      let member = message.member;
+      channel.lastMessageID = data.id;
+      if (user) {
+        user.lastMessageID = data.id;
+        user.lastMessageChannelID = channel.id;
+      }
+      if (member) {
+        member.lastMessageID = data.id;
+        member.lastMessageChannelID = channel.id;
+      }
 
-    let messageData = {
-      id: data.id,
-      timestamp: data.timestamp,
-      mentions: data.mentions,
-      author: client.users.add(data.author),
-      content: data.content,
-      guild: {
-        id: data.guild_id
-      },
-      channel: await client.channels.fetch(data.channel_id)
+      /**
+       * Emitted whenever a message is created.
+       * @event Client#message
+       * @param {Message} message The created message
+       */
+      client.emit(Events.MESSAGE_CREATE, message);
+      return {
+        message
+      };
     }
 
-    /**
-     * Emitted whenever a message is created.
-     * @event Client#message
-     * @param {Message} message The created message
-     */
-
-    client.emit(Events.MESSAGE_CREATE, messageData);
-
+    return {};
   }
 }
 

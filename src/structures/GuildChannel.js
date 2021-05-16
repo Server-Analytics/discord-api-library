@@ -34,19 +34,40 @@ class GuildChannel extends Channel {
      * The guild the channel is in
      * @type {Guild}
      */
-    this.guild = {
-      id: guild.id
-    };
+    this.guild = guild;
   }
 
   _patch(data) {
     super._patch(data);
 
     /**
+     * The name of the guild channel
+     * @type {string}
+     */
+    //this.name = data.name;
+
+    /**
+     * The raw position of the channel from discord
+     * @type {number}
+     */
+    //this.rawPosition = data.position;
+
+    /**
      * The ID of the category parent of this channel
      * @type {?Snowflake}
      */
     this.parentID = data.parent_id || null;
+
+    /**
+     * A map of permission overwrites in this channel for roles and users
+     * @type {Collection<Snowflake, PermissionOverwrites>}
+     */
+    this.permissionOverwrites = new Collection();
+    if (data.permission_overwrites) {
+      for (const overwrite of data.permission_overwrites) {
+        this.permissionOverwrites.set(overwrite.id, new PermissionOverwrites(this, overwrite));
+      }
+    }
   }
 
   /**

@@ -19,6 +19,11 @@ class TextChannel extends GuildChannel {
    */
   constructor(guild, data) {
     super(guild, data);
+    /**
+     * A manager of the messages sent to this channel
+     * @type {MessageManager}
+     */
+    this.messages = new MessageManager(this);
 
     /**
      * If the guild considers this channel NSFW
@@ -26,11 +31,39 @@ class TextChannel extends GuildChannel {
      * @readonly
      */
     this.nsfw = Boolean(data.nsfw);
+    this._typing = new Map();
   }
 
   _patch(data) {
     super._patch(data);
+
+    /**
+     * The topic of the text channel
+     * @type {?string}
+     */
+    this.topic = data.topic;
+
     if (typeof data.nsfw !== 'undefined') this.nsfw = Boolean(data.nsfw);
+
+    /**
+     * The ID of the last message sent in this channel, if one was sent
+     * @type {?Snowflake}
+     */
+    this.lastMessageID = data.last_message_id;
+
+    /**
+     * The ratelimit per user for this channel in seconds
+     * @type {number}
+     */
+    this.rateLimitPerUser = data.rate_limit_per_user || 0;
+
+    /**
+     * The timestamp when the last pinned message was pinned, if there was one
+     * @type {?number}
+     */
+    this.lastPinTimestamp = data.last_pin_timestamp ? new Date(data.last_pin_timestamp).getTime() : null;
+
+    if (data.messages) for (const message of data.messages) this.messages.add(message);
   }
 
   /**
@@ -40,9 +73,7 @@ class TextChannel extends GuildChannel {
    * @returns {Promise<TextChannel>}
    */
   setRateLimitPerUser(rateLimitPerUser, reason) {
-    return this.edit({
-      rateLimitPerUser
-    }, reason);
+    return this.edit({ rateLimitPerUser }, reason);
   }
 
   /**
@@ -52,9 +83,7 @@ class TextChannel extends GuildChannel {
    * @returns {Promise<TextChannel>}
    */
   setNSFW(nsfw, reason) {
-    return this.edit({
-      nsfw
-    }, reason);
+    return this.edit({ nsfw }, reason);
   }
 
   /**
@@ -90,10 +119,7 @@ class TextChannel extends GuildChannel {
    *   .then(console.log)
    *   .catch(console.error)
    */
-  async createWebhook(name, {
-    avatar,
-    reason
-  } = {}) {
+  async createWebhook(name, { avatar, reason } = {}) {
     if (typeof avatar === 'string' && !avatar.startsWith('data:')) {
       avatar = await DataResolver.resolveImage(avatar);
     }

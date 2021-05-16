@@ -5,10 +5,7 @@ const MessageCollector = require('../MessageCollector');
 const APIMessage = require('../APIMessage');
 const Snowflake = require('../../util/Snowflake');
 const Collection = require('../../util/Collection');
-const {
-  RangeError,
-  TypeError
-} = require('../../errors');
+const { RangeError, TypeError } = require('../../errors');
 
 /**
  * Interface for classes that have text-channel-like features.
@@ -172,15 +169,9 @@ class TextBasedChannel {
       }
     }
 
-    const {
-      data,
-      files
-    } = await apiMessage.resolveFiles();
+    const { data, files } = await apiMessage.resolveFiles();
     return this.client.api.channels[this.id].messages
-      .post({
-        data,
-        files
-      })
+      .post({ data, files })
       .then(d => this.client.actions.MessageCreate.handle(d).message);
   }
 
@@ -340,37 +331,31 @@ class TextBasedChannel {
       if (messageIDs.length === 0) return new Collection();
       if (messageIDs.length === 1) {
         await this.client.api.channels(this.id).messages(messageIDs[0]).delete();
-        const message = this.client.actions.MessageDelete.getMessage({
+        const message = this.client.actions.MessageDelete.getMessage(
+          {
             message_id: messageIDs[0],
           },
           this,
         );
-        return message ? new Collection([
-          [message.id, message]
-        ]) : new Collection();
+        return message ? new Collection([[message.id, message]]) : new Collection();
       }
-      await this.client.api.channels[this.id].messages['bulk-delete'].post({
-        data: {
-          messages: messageIDs
-        }
-      });
+      await this.client.api.channels[this.id].messages['bulk-delete'].post({ data: { messages: messageIDs } });
       return messageIDs.reduce(
         (col, id) =>
-        col.set(
-          id,
-          this.client.actions.MessageDeleteBulk.getMessage({
-              message_id: id,
-            },
-            this,
+          col.set(
+            id,
+            this.client.actions.MessageDeleteBulk.getMessage(
+              {
+                message_id: id,
+              },
+              this,
+            ),
           ),
-        ),
         new Collection(),
       );
     }
     if (!isNaN(messages)) {
-      const msgs = await this.messages.fetch({
-        limit: messages
-      });
+      const msgs = await this.messages.fetch({ limit: messages });
       return this.bulkDelete(msgs, filterOld);
     }
     throw new TypeError('MESSAGE_BULK_DELETE_TYPE');

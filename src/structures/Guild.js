@@ -11,7 +11,6 @@ const Integration = require('./Integration');
 const Invite = require('./Invite');
 const VoiceRegion = require('./VoiceRegion');
 const Webhook = require('./Webhook');
-const Permissions = require('../util/Permissions');
 const {
   Error,
   TypeError
@@ -72,7 +71,7 @@ class Guild extends Base {
      * A manager of the presences belonging to this guild
      * @type {PresenceManager}
      */
-    //this.presences = new PresenceManager(this.client);
+    this.presences = new PresenceManager(this.client);
 
     /**
      * A manager of the voice states of this guild
@@ -142,19 +141,19 @@ class Guild extends Base {
      * The hash of the guild invite splash image
      * @type {?string}
      */
-    //this.splash = data.splash;
+    this.splash = data.splash;
 
     /**
      * The hash of the guild discovery splash image
      * @type {?string}
      */
-    //this.discoverySplash = data.discovery_splash;
+    this.discoverySplash = data.discovery_splash;
 
     /**
      * The region the guild is located in
      * @type {string}
      */
-    //this.region = data.region;
+    this.region = data.region;
 
     /**
      * The full amount of members in this guild
@@ -191,31 +190,31 @@ class Guild extends Base {
      * An array of guild features partnered guilds have enabled
      * @type {Features[]}
      */
-    //this.features = data.features;
+    this.features = data.features;
 
     /**
      * The ID of the application that created this guild (if applicable)
      * @type {?Snowflake}
      */
-    //this.applicationID = data.application_id;
+    this.applicationID = data.application_id;
 
     /**
      * The time in seconds before a user is counted as "away from keyboard"
      * @type {?number}
      */
-    //this.afkTimeout = data.afk_timeout;
+    this.afkTimeout = data.afk_timeout;
 
     /**
      * The ID of the voice channel where AFK members are moved
      * @type {?Snowflake}
      */
-    //this.afkChannelID = data.afk_channel_id;
+    this.afkChannelID = data.afk_channel_id;
 
     /**
      * The ID of the system channel
      * @type {?Snowflake}
      */
-    //this.systemChannelID = data.system_channel_id;
+    this.systemChannelID = data.system_channel_id;
 
     /**
      * Whether embedded images are enabled on this guild
@@ -252,7 +251,7 @@ class Guild extends Base {
        * Whether widget images are enabled on this guild
        * @type {?boolean}
        */
-      //this.widgetEnabled = data.widget_enabled;
+      this.widgetEnabled = data.widget_enabled;
     }
 
     if (typeof data.widget_channel_id !== 'undefined') {
@@ -260,7 +259,7 @@ class Guild extends Base {
        * The widget channel ID, if enabled
        * @type {?string}
        */
-      //this.widgetChannelID = data.widget_channel_id;
+      this.widgetChannelID = data.widget_channel_id;
     }
 
     if (typeof data.embed_channel_id !== 'undefined') {
@@ -276,19 +275,19 @@ class Guild extends Base {
      * The verification level of the guild
      * @type {VerificationLevel}
      */
-    //this.verificationLevel = VerificationLevels[data.verification_level];
+    this.verificationLevel = VerificationLevels[data.verification_level];
 
     /**
      * The explicit content filter level of the guild
      * @type {ExplicitContentFilterLevel}
      */
-    //this.explicitContentFilter = ExplicitContentFilterLevels[data.explicit_content_filter];
+    this.explicitContentFilter = ExplicitContentFilterLevels[data.explicit_content_filter];
 
     /**
      * The required MFA level for the guild
      * @type {number}
      */
-    //this.mfaLevel = data.mfa_level;
+    this.mfaLevel = data.mfa_level;
 
     /**
      * The timestamp the client user joined the guild at
@@ -300,14 +299,14 @@ class Guild extends Base {
      * The value set for the guild's default message notifications
      * @type {DefaultMessageNotifications|number}
      */
-    //this.defaultMessageNotifications =
-    DefaultMessageNotifications[data.default_message_notifications] || data.default_message_notifications;
+    this.defaultMessageNotifications =
+      DefaultMessageNotifications[data.default_message_notifications] || data.default_message_notifications;
 
     /**
      * The value set for the guild's system channel flags
      * @type {Readonly<SystemChannelFlags>}
      */
-    //this.systemChannelFlags = new SystemChannelFlags(data.system_channel_flags).freeze();
+    this.systemChannelFlags = new SystemChannelFlags(data.system_channel_flags).freeze();
 
     if (typeof data.max_members !== 'undefined') {
       /**
@@ -356,7 +355,7 @@ class Guild extends Base {
      * The vanity invite code of the guild, if any
      * @type {?string}
      */
-    //this.vanityURLCode = data.vanity_url_code;
+    this.vanityURLCode = data.vanity_url_code;
 
     /* eslint-disable max-len */
     /**
@@ -364,62 +363,60 @@ class Guild extends Base {
      * <info>You will need to fetch this parameter using {@link Guild#fetchVanityData} if you want to receive it</info>
      * @type {?number}
      */
-    //this.vanityURLUses = null;
+    this.vanityURLUses = null;
     /* eslint-enable max-len */
 
     /**
      * The description of the guild, if any
      * @type {?string}
      */
-    //this.description = data.description;
+    this.description = data.description;
 
     /**
      * The hash of the guild banner
      * @type {?string}
      */
-    //this.banner = data.banner;
+    this.banner = data.banner;
 
     this.id = data.id;
     this.available = !data.unavailable;
-    //this.features = data.features || this.features || [];
+    this.features = data.features || this.features || [];
 
     /**
      * The ID of the rules channel for the guild
      * @type {?Snowflake}
      */
-    //this.rulesChannelID = data.rules_channel_id;
+    this.rulesChannelID = data.rules_channel_id;
 
     /**
      * The ID of the community updates channel for the guild
      * @type {?Snowflake}
      */
-    //this.publicUpdatesChannelID = data.public_updates_channel_id;
+    this.publicUpdatesChannelID = data.public_updates_channel_id;
 
     /**
      * The preferred locale of the guild, defaults to `en-US`
      * @type {string}
      */
     this.preferredLocale = data.preferred_locale;
+    let currentTimestamp = Date.now();
 
-    if (false && data.channels) {
+    if (data.channels) {
       this.channels.cache.clear();
       for (const rawChannel of data.channels) {
-        this.client.channels.add(rawChannel, this);
+        if (currentTimestamp - this.convertIDtoUnix(rawChannel.last_message_id) < 2628000000) this.client.channels.add(rawChannel, this);
+        else this.client.optimizedStats.channels.inactive++;
       }
     }
 
     if (data.roles) {
       this.roles.cache.clear();
-      for (const role of data.roles) {
-        if (new Permissions(role.permissions).has(Permissions.FLAGS.KICK_MEMBERS)) this.roles.add(role);
-      }
+      for (const role of data.roles) this.roles.add(role);
     }
 
     if (data.members) {
       this.members.cache.clear();
-      for (const guildUser of data.members) {
-        if (this.roles.cache.map(r => r.id).some(r => guildUser.roles.includes(r))) this.members.add(guildUser);
-      }
+      for (const guildUser of data.members) this.members.add(guildUser);
     }
 
     if (data.owner_id) {
@@ -430,7 +427,7 @@ class Guild extends Base {
       this.ownerID = data.owner_id;
     }
 
-    if (false && data.presences) {
+    if (data.presences) {
       for (const presence of data.presences) {
         this.presences.add(Object.assign(presence, {
           guild: this
@@ -443,6 +440,21 @@ class Guild extends Base {
       for (const voiceState of data.voice_states) {
         this.voiceStates.add(voiceState);
       }
+    }
+
+    if (!this.emojis) {
+      /**
+       * A manager of the emojis belonging to this guild
+       * @type {GuildEmojiManager}
+       */
+      this.emojis = new GuildEmojiManager(this);
+      if (data.emojis)
+        for (const emoji of data.emojis) this.emojis.add(emoji);
+    } else if (data.emojis) {
+      this.client.actions.GuildEmojisUpdate.handle({
+        guild_id: this.id,
+        emojis: data.emojis,
+      });
     }
   }
 

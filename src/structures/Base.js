@@ -14,7 +14,9 @@ class Base {
      * @type {Client}
      * @readonly
      */
-    Object.defineProperty(this, 'client', { value: client });
+    Object.defineProperty(this, 'client', {
+      value: client
+    });
   }
 
   _clone() {
@@ -37,6 +39,16 @@ class Base {
 
   valueOf() {
     return this.id;
+  }
+
+  convertIDtoUnix(id) {
+    var bin = (+id).toString(2);
+    var unixbin = '';
+    var unix = '';
+    var m = 64 - bin.length;
+    unixbin = bin.substring(0, 42 - m);
+    unix = parseInt(unixbin, 2) + 1420070400000;
+    return unix;
   }
 }
 

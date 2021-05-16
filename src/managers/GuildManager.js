@@ -16,7 +16,9 @@ const {
 } = require('../util/Constants');
 const DataResolver = require('../util/DataResolver');
 const Permissions = require('../util/Permissions');
-const { resolveColor } = require('../util/Util');
+const {
+  resolveColor
+} = require('../util/Util');
 
 /**
  * Manages API methods for Guilds and stores their cache.
@@ -145,8 +147,7 @@ class GuildManager extends BaseManager {
    * @returns {Promise<Guild>} The guild that was created
    */
   async create(
-    name,
-    {
+    name, {
       afkChannelID,
       afkTimeout,
       channels = [],
@@ -187,42 +188,42 @@ class GuildManager extends BaseManager {
     }
     return new Promise((resolve, reject) =>
       this.client.api.guilds
-        .post({
-          data: {
-            name,
-            region,
-            icon,
-            verification_level: verificationLevel,
-            default_message_notifications: defaultMessageNotifications,
-            explicit_content_filter: explicitContentFilter,
-            roles,
-            channels,
-            afk_channel_id: afkChannelID,
-            afk_timeout: afkTimeout,
-            system_channel_id: systemChannelID,
-          },
-        })
-        .then(data => {
-          if (this.client.guilds.cache.has(data.id)) return resolve(this.client.guilds.cache.get(data.id));
+      .post({
+        data: {
+          name,
+          region,
+          icon,
+          verification_level: verificationLevel,
+          default_message_notifications: defaultMessageNotifications,
+          explicit_content_filter: explicitContentFilter,
+          roles,
+          channels,
+          afk_channel_id: afkChannelID,
+          afk_timeout: afkTimeout,
+          system_channel_id: systemChannelID,
+        },
+      })
+      .then(data => {
+        if (this.client.guilds.cache.has(data.id)) return resolve(this.client.guilds.cache.get(data.id));
 
-          const handleGuild = guild => {
-            if (guild.id === data.id) {
-              this.client.clearTimeout(timeout);
-              this.client.removeListener(Events.GUILD_CREATE, handleGuild);
-              this.client.decrementMaxListeners();
-              resolve(guild);
-            }
-          };
-          this.client.incrementMaxListeners();
-          this.client.on(Events.GUILD_CREATE, handleGuild);
-
-          const timeout = this.client.setTimeout(() => {
+        const handleGuild = guild => {
+          if (guild.id === data.id) {
+            this.client.clearTimeout(timeout);
             this.client.removeListener(Events.GUILD_CREATE, handleGuild);
             this.client.decrementMaxListeners();
-            resolve(this.client.guilds.add(data));
-          }, 10000);
-          return undefined;
-        }, reject),
+            resolve(guild);
+          }
+        };
+        this.client.incrementMaxListeners();
+        this.client.on(Events.GUILD_CREATE, handleGuild);
+
+        const timeout = this.client.setTimeout(() => {
+          this.client.removeListener(Events.GUILD_CREATE, handleGuild);
+          this.client.decrementMaxListeners();
+          resolve(this.client.guilds.add(data));
+        }, 10000);
+        return undefined;
+      }, reject),
     );
   }
 
@@ -244,7 +245,11 @@ class GuildManager extends BaseManager {
       if (existing) return existing;
     }
 
-    const data = await this.client.api.guilds(id).get({ query: { with_counts: true } });
+    const data = await this.client.api.guilds(id).get({
+      query: {
+        with_counts: true
+      }
+    });
     return this.add(data, cache);
   }
 }

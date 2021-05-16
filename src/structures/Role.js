@@ -1,10 +1,7 @@
 'use strict';
 
 const Base = require('./Base');
-const {
-  Error,
-  TypeError
-} = require('../errors');
+const { Error, TypeError } = require('../errors');
 const Permissions = require('../util/Permissions');
 const Snowflake = require('../util/Snowflake');
 const Util = require('../util/Util');
@@ -26,9 +23,7 @@ class Role extends Base {
      * The guild that the role belongs to
      * @type {Guild}
      */
-    this.guild = {
-      id: guild.id
-    };
+    this.guild = guild;
 
     if (data) this._patch(data);
   }
@@ -44,7 +39,7 @@ class Role extends Base {
      * The name of the role
      * @type {string}
      */
-    //this.name = data.name;
+    this.name = data.name;
 
     /**
      * The base 10 color of the role
@@ -62,7 +57,7 @@ class Role extends Base {
      * The raw position of the role from the API
      * @type {number}
      */
-    //this.rawPosition = data.position;
+    this.rawPosition = data.position;
 
     /**
      * The permissions of the role
@@ -74,13 +69,13 @@ class Role extends Base {
      * Whether or not the role is managed by an external service
      * @type {boolean}
      */
-    //this.managed = data.managed;
+    this.managed = data.managed;
 
     /**
      * Whether or not the role can be mentioned by anyone
      * @type {boolean}
      */
-    //this.mentionable = data.mentionable;
+    this.mentionable = data.mentionable;
 
     /**
      * Whether the role has been deleted
@@ -241,9 +236,7 @@ class Role extends Base {
    *   .catch(console.error);
    */
   setName(name, reason) {
-    return this.edit({
-      name
-    }, reason);
+    return this.edit({ name }, reason);
   }
 
   /**
@@ -258,9 +251,7 @@ class Role extends Base {
    *   .catch(console.error);
    */
   setColor(color, reason) {
-    return this.edit({
-      color
-    }, reason);
+    return this.edit({ color }, reason);
   }
 
   /**
@@ -275,9 +266,7 @@ class Role extends Base {
    *   .catch(console.error);
    */
   setHoist(hoist, reason) {
-    return this.edit({
-      hoist
-    }, reason);
+    return this.edit({ hoist }, reason);
   }
 
   /**
@@ -297,9 +286,7 @@ class Role extends Base {
    *   .catch(console.error);
    */
   setPermissions(permissions, reason) {
-    return this.edit({
-      permissions
-    }, reason);
+    return this.edit({ permissions }, reason);
   }
 
   /**
@@ -314,9 +301,7 @@ class Role extends Base {
    *   .catch(console.error);
    */
   setMentionable(mentionable, reason) {
-    return this.edit({
-      mentionable
-    }, reason);
+    return this.edit({ mentionable }, reason);
   }
 
   /**
@@ -332,10 +317,7 @@ class Role extends Base {
    *   .then(updated => console.log(`Role position: ${updated.position}`))
    *   .catch(console.error);
    */
-  setPosition(position, {
-    relative,
-    reason
-  } = {}) {
+  setPosition(position, { relative, reason } = {}) {
     return Util.setPosition(
       this,
       position,
@@ -363,13 +345,8 @@ class Role extends Base {
    *   .catch(console.error);
    */
   delete(reason) {
-    return this.client.api.guilds[this.guild.id].roles[this.id].delete({
-      reason
-    }).then(() => {
-      this.client.actions.GuildRoleDelete.handle({
-        guild_id: this.guild.id,
-        role_id: this.id
-      });
+    return this.client.api.guilds[this.guild.id].roles[this.id].delete({ reason }).then(() => {
+      this.client.actions.GuildRoleDelete.handle({ guild_id: this.guild.id, role_id: this.id });
       return this;
     });
   }
@@ -407,9 +384,7 @@ class Role extends Base {
   }
 
   toJSON() {
-    return super.toJSON({
-      createdTimestamp: true
-    });
+    return super.toJSON({ createdTimestamp: true });
   }
 
   /**

@@ -3,11 +3,9 @@
 const Base = require('./Base');
 const Role = require('./Role');
 const TextBasedChannel = require('./interfaces/TextBasedChannel');
-
 const {
   Error
 } = require('../errors');
-
 const GuildMemberRoleManager = require('../managers/GuildMemberRoleManager');
 const Permissions = require('../util/Permissions');
 let Structures;
@@ -30,15 +28,37 @@ class GuildMember extends Base {
      * The guild that this member is part of
      * @type {Guild}
      */
-    this.guild = {
-      id: guild
-    };
+    this.guild = guild;
 
     /**
      * The timestamp the member joined the guild at
      * @type {?number}
      */
     this.joinedTimestamp = null;
+
+    /**
+     * The ID of the last message sent by the member in their guild, if one was sent
+     * @type {?Snowflake}
+     */
+    //this.lastMessageID = null;
+
+    /**
+     * The ID of the channel for the last message sent by the member in their guild, if one was sent
+     * @type {?Snowflake}
+     */
+    //this.lastMessageChannelID = null;
+
+    /**
+     * The timestamp of when the member used their Nitro boost on the guild, if it was used
+     * @type {?number}
+     */
+    //this.premiumSinceTimestamp = null;
+
+    /**
+     * Whether the member has been removed from the guild
+     * @type {boolean}
+     */
+    this.deleted = false;
 
     /**
      * The nickname of this member, if they have one
@@ -50,7 +70,20 @@ class GuildMember extends Base {
     if (data) this._patch(data);
   }
 
-  _patch(data) {}
+  _patch(data) {
+    if ('user' in data) {
+      /**
+       * The user that this guild member instance represents
+       * @type {User}
+       */
+      this.user = this.client.users.add(data.user, true);
+    }
+
+    if ('nick' in data) this.nickname = data.nick;
+    if ('joined_at' in data) this.joinedTimestamp = new Date(data.joined_at).getTime();
+    if ('premium_since' in data) this.premiumSinceTimestamp = new Date(data.premium_since).getTime();
+    if ('roles' in data) this._roles = data.roles;
+  }
 
   _clone() {
     const clone = super._clone();

@@ -88,6 +88,16 @@ class Client extends BaseClient {
     this._validateOptions();
 
     /**
+     * Omptimisation stats
+     * @type {Object}
+     */
+    this.optimizedStats = {
+      channels: {
+        inactive: 0
+      }
+    }
+
+    /**
      * The WebSocket manager of the client
      * @type {WebSocketManager}
      */
@@ -187,7 +197,8 @@ class Client extends BaseClient {
       client: this
     });
     for (const guild of this.guilds.cache.values()) {
-      //if (guild.available) for (const emoji of guild.emojis.cache.values()) emojis.cache.set(emoji.id, emoji);
+      if (guild.available)
+        for (const emoji of guild.emojis.cache.values()) emojis.cache.set(emoji.id, emoji);
     }
     return emojis;
   }
