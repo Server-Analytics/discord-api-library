@@ -193,14 +193,7 @@ class Client extends BaseClient {
    * @readonly
    */
   get emojis() {
-    const emojis = new GuildEmojiManager({
-      client: this
-    });
-    for (const guild of this.guilds.cache.values()) {
-      if (guild.available)
-        for (const emoji of guild.emojis.cache.values()) emojis.cache.set(emoji.id, emoji);
-    }
-    return emojis;
+    return false;
   }
 
   /**

@@ -427,7 +427,7 @@ class Guild extends Base {
       this.ownerID = data.owner_id;
     }
 
-    if (data.presences) {
+    if (false && data.presences) {
       for (const presence of data.presences) {
         this.presences.add(Object.assign(presence, {
           guild: this
@@ -440,21 +440,6 @@ class Guild extends Base {
       for (const voiceState of data.voice_states) {
         this.voiceStates.add(voiceState);
       }
-    }
-
-    if (!this.emojis) {
-      /**
-       * A manager of the emojis belonging to this guild
-       * @type {GuildEmojiManager}
-       */
-      this.emojis = new GuildEmojiManager(this);
-      if (data.emojis)
-        for (const emoji of data.emojis) this.emojis.add(emoji);
-    } else if (data.emojis) {
-      this.client.actions.GuildEmojisUpdate.handle({
-        guild_id: this.id,
-        emojis: data.emojis,
-      });
     }
   }
 

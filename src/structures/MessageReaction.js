@@ -21,7 +21,9 @@ class MessageReaction {
      * @type {Client}
      * @readonly
      */
-    Object.defineProperty(this, 'client', { value: client });
+    Object.defineProperty(this, 'client', {
+      value: client
+    });
     /**
      * The message that this reaction refers to
      * @type {Message}
@@ -80,12 +82,7 @@ class MessageReaction {
     if (this._emoji instanceof GuildEmoji) return this._emoji;
     // Check to see if the emoji has become known to the client
     if (this._emoji.id) {
-      const emojis = this.message.client.emojis.cache;
-      if (emojis.has(this._emoji.id)) {
-        const emoji = emojis.get(this._emoji.id);
-        this._emoji = emoji;
-        return emoji;
-      }
+
     }
     return this._emoji;
   }
@@ -107,12 +104,17 @@ class MessageReaction {
     const message = await this.message.fetch();
     const existing = message.reactions.cache.get(this.emoji.id || this.emoji.name);
     // The reaction won't get set when it has been completely removed
-    this._patch(existing || { count: 0 });
+    this._patch(existing || {
+      count: 0
+    });
     return this;
   }
 
   toJSON() {
-    return Util.flatten(this, { emoji: 'emojiID', message: 'messageID' });
+    return Util.flatten(this, {
+      emoji: 'emojiID',
+      message: 'messageID'
+    });
   }
 
   _add(user) {
