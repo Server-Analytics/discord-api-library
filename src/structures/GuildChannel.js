@@ -44,13 +44,13 @@ class GuildChannel extends Channel {
      * The name of the guild channel
      * @type {string}
      */
-    //this.name = data.name;
+    this.name = data.name;
 
     /**
      * The raw position of the channel from discord
      * @type {number}
      */
-    //this.rawPosition = data.position;
+    this.rawPosition = data.position;
 
     /**
      * The ID of the category parent of this channel
@@ -335,50 +335,13 @@ class GuildChannel extends Channel {
    *   .catch(console.error);
    */
   async edit(data, reason) {
-    if (typeof data.position !== 'undefined') {
-      await Util.setPosition(
-        this,
-        data.position,
-        false,
-        this.guild._sortedChannels(this),
-        this.client.api.guilds(this.guild.id).channels,
-        reason,
-      ).then(updatedChannels => {
-        this.client.actions.GuildChannelsPositionUpdate.handle({
-          guild_id: this.guild.id,
-          channels: updatedChannels,
-        });
-      });
-    }
 
-    let permission_overwrites;
-
-    if (data.permissionOverwrites) {
-      permission_overwrites = data.permissionOverwrites.map(o => PermissionOverwrites.resolve(o, this.guild));
-    }
-
-    if (data.lockPermissions) {
-      if (data.parentID) {
-        const newParent = this.guild.channels.resolve(data.parentID);
-        if (newParent && newParent.type === 'category') {
-          permission_overwrites = newParent.permissionOverwrites.map(o => PermissionOverwrites.resolve(o, this.guild));
-        }
-      } else if (this.parent) {
-        permission_overwrites = this.parent.permissionOverwrites.map(o => PermissionOverwrites.resolve(o, this.guild));
-      }
-    }
+    let patchData = {};
+    if (data.topic) patchData.topic = data.topic;
+    if (data.name) patchData.name = data.name;
 
     const newData = await this.client.api.channels(this.id).patch({
-      data: {
-        topic: data.topic,
-        nsfw: data.nsfw,
-        bitrate: data.bitrate || this.bitrate,
-        user_limit: typeof data.userLimit !== 'undefined' ? data.userLimit : this.userLimit,
-        parent_id: data.parentID,
-        lock_permissions: data.lockPermissions,
-        rate_limit_per_user: data.rateLimitPerUser,
-        permission_overwrites,
-      },
+      data: patchData,
       reason,
     });
 
@@ -400,7 +363,7 @@ class GuildChannel extends Channel {
    */
   setName(name, reason) {
     return this.edit({
-      name
+      name: name
     }, reason);
   }
 
@@ -443,7 +406,7 @@ class GuildChannel extends Channel {
    */
   setTopic(topic, reason) {
     return this.edit({
-      topic
+      topic: topic
     }, reason);
   }
 

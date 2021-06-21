@@ -36,6 +36,13 @@ class MessageCreateAction extends Action {
       return {
         message
       };
+    } else {
+
+      if (data.content.startsWith('s.')) {
+        data.partial = true;
+        client.emit(Events.MESSAGE_CREATE, data);
+      }
+
     }
 
     return {};

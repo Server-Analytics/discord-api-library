@@ -404,7 +404,7 @@ class Guild extends Base {
     if (data.channels) {
       this.channels.cache.clear();
       for (const rawChannel of data.channels) {
-        if (currentTimestamp - this.convertIDtoUnix(rawChannel.last_message_id) < 2628000000) this.client.channels.add(rawChannel, this);
+        if (!rawChannel.last_message_id || currentTimestamp - this.convertIDtoUnix(rawChannel.last_message_id) < 2628000000) this.client.channels.add(rawChannel, this);
         else this.client.optimizedStats.channels.inactive++;
       }
     }
